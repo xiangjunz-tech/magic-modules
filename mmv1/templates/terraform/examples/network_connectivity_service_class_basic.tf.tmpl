@@ -1,0 +1,5 @@
+resource "google_network_connectivity_service_class" "{{$.PrimaryResourceId}}" {
+  name        = "{{index $.Vars "resource_name"}}"
+  location    = "us-central1"
+  description = "{{index $.Vars "description"}}"
+}

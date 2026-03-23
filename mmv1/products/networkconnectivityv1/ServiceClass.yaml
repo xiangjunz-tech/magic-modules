@@ -1,0 +1,106 @@
+# Copyright 2026 Google Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+name: 'ServiceClass'
+description: |
+  Manages a ServiceClass resource within Service Connectivity Automation.
+  ServiceClasses are unique, symbolic representations of a service.
+references:
+  guides:
+    'About Service Connectivity Automation': 'https://cloud.google.com/vpc/docs/about-service-connectivity-automation'
+  api: 'https://cloud.google.com/network-connectivity/docs/reference/networkconnectivity/rest/v1/projects.locations.serviceClasses' # Verify this URL
+docs:
+base_url: 'projects/{{project}}/locations/{{location}}/serviceClasses'
+self_link: 'projects/{{project}}/locations/{{location}}/serviceClasses/{{name}}'
+create_url: 'projects/{{project}}/locations/{{location}}/serviceClasses?serviceClassId={{name}}'
+update_verb: 'PATCH'
+update_mask: true
+import_format:
+  - 'projects/{{project}}/locations/{{location}}/serviceClasses/{{name}}'
+timeouts:
+  insert_minutes: 30
+  update_minutes: 30
+  delete_minutes: 30
+autogen_async: true
+async:
+  actions: ['create', 'delete', 'update']
+  type: 'OpAsync'
+  operation:
+    base_url: '{{op_id}}'
+    timeouts:
+      insert_minutes: 30
+      update_minutes: 30
+      delete_minutes: 30
+  result:
+    resource_inside_response: false
+parameters:
+  - name: 'name'
+    type: String
+    description: |
+      The name of the ServiceClass. The name is only used to identify the resource.
+      Format: projects/{project}/locations/{location}/serviceClasses/{service_class}
+    url_param_only: true
+    required: true
+    immutable: true
+  - name: 'location'
+    type: String
+    description: |
+      The location of the ServiceClass.
+    url_param_only: true
+    required: true
+    immutable: true
+properties:
+  - name: 'serviceClass'
+    type: String
+    description: |
+      The generated service class name. Use this name to refer to the Service class in Service Connection Maps and Service Connection Policies.
+    output: true # Matches (google.api.field_behavior) = OUTPUT_ONLY
+  - name: 'createTime'
+    type: Time
+    description: |
+      Time when the ServiceClass was created.
+    output: true # Matches (google.api.field_behavior) = OUTPUT_ONLY
+  - name: 'updateTime'
+    type: Time
+    description: |
+      Time when the ServiceClass was updated.
+    output: true # Matches (google.api.field_behavior) = OUTPUT_ONLY
+  - name: 'labels'
+    type: KeyValueLabels
+    description: |
+      User-defined labels.
+    # Optional by default
+  - name: 'description'
+    type: String
+    description: |
+      A description of this resource.
+    # Optional by default
+  - name: 'etag'
+    type: Fingerprint
+    description: |
+      Optional. The etag is computed by the server, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.
+    output: true # etag is typically output only
+examples:
+  - name: 'network_connectivity_service_class_basic'
+    primary_resource_id: 'default'
+    vars:
+      resource_name: 'my-service-class'
+      description: "A sample service class."
+
+
+# Sweeper configuration (if needed for cleanup)
+# sweeper:
+#   prefixes: ["tf-test-service-class"]
+#   url_substitutions:
+#   - region: "us-central1"
