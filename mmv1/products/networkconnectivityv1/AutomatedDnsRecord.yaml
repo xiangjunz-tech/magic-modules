@@ -1,0 +1,219 @@
+# Copyright 2026 Google Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+name: 'AutomatedDnsRecord'
+description:
+  'Manages an Automated DNS Record resource within Service Connectivity Automation.'
+references:
+  guides:
+    'About Service Connectivity Automation': 'https://cloud.google.com/vpc/docs/about-service-connectivity-automation'
+  api: 'https://cloud.google.com/network-connectivity/docs/reference/networkconnectivity/rest/v1/projects.locations.automatedDnsRecords'
+docs:
+base_url: 'projects/{{project}}/locations/{{location}}/automatedDnsRecords'
+self_link: 'projects/{{project}}/locations/{{location}}/automatedDnsRecords/{{name}}'
+create_url: 'projects/{{project}}/locations/{{location}}/automatedDnsRecords?automatedDnsRecordId={{name}}'
+# No Update method is defined for AutomatedDnsRecord in the proto.
+import_format:
+  - 'projects/{{project}}/locations/{{location}}/automatedDnsRecords/{{name}}'
+timeouts:
+  insert_minutes: 30
+  delete_minutes: 30
+autogen_async: true
+async:
+  actions: ['create', 'delete']
+  type: 'OpAsync'
+  operation:
+    base_url: '{{op_id}}'
+    timeouts:
+      insert_minutes: 30
+      delete_minutes: 30
+  result:
+    resource_inside_response: false
+parameters:
+  - name: 'name'
+    type: String
+    description: |
+      The name of the AutomatedDnsRecord.
+      Format: projects/{project}/locations/{location}/automatedDnsRecords/{automated_dns_record}
+    url_param_only: true
+    required: true
+    immutable: true
+  - name: 'location'
+    type: String
+    description: |
+      The location of the AutomatedDnsRecord.
+    url_param_only: true
+    required: true
+    immutable: true
+properties:
+  - name: 'hostname'
+    type: String
+    description: |
+      The hostname for the DNS record. This value will be prepended to the `dns_suffix` to create the full domain name (FQDN).
+      Should not include a trailing dot.
+    required: true
+    immutable: true
+  - name: 'dnsSuffix'
+    type: String
+    description: |
+      The dns suffix for this record. Requires a trailing dot. Example: "example.com."
+    required: true
+    immutable: true
+  - name: 'recordType'
+    type: Enum
+    description: |
+      The identifier of a supported record type.
+    required: true
+    immutable: true
+    enum_values:
+      - 'RECORD_TYPE_UNSPECIFIED'
+      - 'A'
+      - 'AAAA'
+      - 'TXT'
+      - 'CNAME'
+  - name: 'serviceClass'
+    type: String
+    description: |
+      The service class identifier which authorizes this AutomatedDnsRecord.
+    required: true
+    immutable: true
+  - name: 'consumerNetwork'
+    type: String
+    description: |
+      The full resource path of the consumer network this AutomatedDnsRecord is visible to.
+      Example: "projects/{projectNumOrId}/global/networks/{networkName}".
+    required: true
+    immutable: true
+  - name: 'originalConfig'
+    type: NestedObject
+    description: |
+      The configuration settings used to create this DNS record.
+    required: true
+    immutable: true
+    properties:
+      - name: 'ttl'
+        type: String
+        description: |
+          Number of seconds that this DNS record can be cached by resolvers. Uses string format for Duration, e.g. "30s".
+        required: true
+      - name: 'rrdatas'
+        type: Array
+        description: |
+          The list of resource record data strings. Content depends on the record type.
+        required: true
+        item_type:
+          type: String
+  - name: 'creationMode'
+    type: Enum
+    description: |
+      The creation mode of the AutomatedDnsRecord.
+    required: true
+    immutable: true
+    enum_values:
+      - 'CREATION_MODE_UNSPECIFIED'
+      - 'CONSUMER_API'
+      - 'SERVICE_CONNECTION_MAP'
+  - name: 'description'
+    type: String
+    description: |
+      A human-readable description of the record.
+  - name: 'labels'
+    type: KeyValueLabels
+    description: |
+      User-defined labels.
+  - name: 'createTime'
+    type: Time
+    description: |
+      The timestamp of when the record was created.
+    output: true
+  - name: 'updateTime'
+    type: Time
+    description: |
+      The timestamp of when the record was updated.
+    output: true
+  - name: 'currentConfig'
+    type: NestedObject
+    description: |
+      The current settings for this record in Cloud DNS.
+    output: true
+    properties:
+      - name: 'ttl'
+        type: String
+        description: |
+          Current TTL of the DNS record. Uses string format for Duration, e.g. "30s".
+        output: true
+      - name: 'rrdatas'
+        type: Array
+        description: |
+          Current rrdata of the DNS record.
+        output: true
+        item_type:
+          type: String
+  - name: 'fqdn'
+    type: String
+    description: |
+      The FQDN created by combining the hostname and dns suffix.
+    output: true
+  - name: 'state'
+    type: Enum
+    description: |
+      The current operational state of this AutomatedDnsRecord.
+    output: true
+    enum_values:
+      - 'STATE_UNSPECIFIED'
+      - 'PROGRAMMED'
+      - 'FAILED_DEPROGRAMMING'
+      - 'CREATING'
+      - 'DELETING'
+  - name: 'stateDetails'
+    type: String
+    description: |
+      A human-readable message providing more context about the current state.
+    output: true
+  - name: 'dnsZone'
+    type: String
+    description: |
+      The DNS zone managed by automation. Format: projects/{project}/managedZones/{managedZone}
+    output: true
+  - name: 'etag'
+    type: Fingerprint
+    description: |
+      Optional. The etag is computed by the server, and may be sent on delete requests to ensure the client has an up-to-date value.
+    output: true
+examples:
+  - name: 'network_connectivity_adr_basic'
+    primary_resource_id: 'default'
+    vars:
+      resource_name: 'my-network-connectivity-adr'
+      hostname: "mydb"
+      dns_suffix: '"example.com."'
+      record_type: '"A"'
+      service_class: "gcp-example-service" # Replace with a valid service class for testing
+      test_network_name: 'test-network-adr'
+      test_subnetwork_name: 'test-subnet-adr'
+      test_policy_name: 'test-policy-adr'
+      config_ttl: '"300s"'
+      rrdata_1: '"192.0.2.1"'
+      creation_mode: '"CONSUMER_API"'
+      description: "A basic A record managed by Terraform."
+    test_vars_overrides:
+      # These overrides are used specifically by the acceptance tests.
+      # Ensure these values work in your test environment.
+      service_class: '"gcp-memorystore-redis"' # Example override
+      record_type: '"A"'
+      creation_mode: '"CONSUMER_API"'
+      config_ttl: '"300s"'
+      rrdatas_1: '"192.0.2.1"'
+      dns_suffix: '"example.com."'
+

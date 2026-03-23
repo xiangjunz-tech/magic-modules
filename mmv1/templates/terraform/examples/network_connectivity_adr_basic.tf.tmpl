@@ -1,0 +1,41 @@
+resource "google_compute_network" "test_network" {
+  name                    = "{{index $.Vars "test_network_name"}}"
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "test_subnet" {
+  name          = "{{index $.Vars "test_subnetwork_name"}}"
+  ip_cidr_range = "10.0.0.0/16"
+  region        = "us-central1"
+  network       = google_compute_network.test_network.id
+}
+
+resource "google_network_connectivity_service_connection_policy" "test_policy" {
+  name = "{{index $.Vars "test_policy_name"}}"
+  location = "us-central1"
+  service_class = "{{index $.Vars "service_class"}}"
+  description   = "Service connection policy for ADR test"
+  network = google_compute_network.test_network.id
+  psc_config {
+    subnetworks = [google_compute_subnetwork.test_subnet.id]
+    limit = 2
+  }
+}
+resource "google_network_connectivity_automated_dns_record" "{{$.PrimaryResourceId}}" {
+  name             = "{{index $.Vars "resource_name"}}"
+  location         = "us-central1"
+  hostname         = "{{index $.Vars "hostname"}}"
+  dns_suffix       = "{{index $.Vars "dns_suffix"}}"
+  record_type      = "{{index $.Vars "record_type"}}"
+  service_class    = "{{index $.Vars "service_class"}}"
+  consumer_network = google_compute_network.test_network.id
+  creation_mode    = "{{index $.Vars "creation_mode"}}"
+  description      = "{{index $.Vars "description"}}"
+
+  original_config {
+    ttl     = "200s"
+    rrdatas = ["190.1.1.1"]
+
+  }
+ depends_on = [google_network_connectivity_service_connection_policy.test_policy]
+}
